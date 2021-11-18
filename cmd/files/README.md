@@ -1,0 +1,5 @@
+# goinit
+
+## Installation
+
+## Usage
