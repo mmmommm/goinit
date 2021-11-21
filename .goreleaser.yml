@@ -25,3 +25,25 @@ builds:
       - linux
       - windows
       - darwin
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+brews:
+  -
+    name: goinit
+    github:
+      owner: mmmommm
+      name: homebrew-tap
+    url_template: "https://github.com/mmmommm/goinit/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@carlosbecker.com
+    homepage: "https://mmmommm.github.io/"
+    description: "Initialization for Go."
+    test: |
+      system "#{bin}/goinit -h"
+    install: |
+      bin.install "goinit"
