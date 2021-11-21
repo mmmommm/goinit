@@ -52,7 +52,7 @@ func createFiles() error {
 	}
 	for _, fi := range fis {
 		if fi.Name() == "ci.yaml" {
-			if err := createActions() {
+			if err := createActions(); err != nil {
 				return err
 			}
 			return nil
@@ -65,8 +65,7 @@ func createFiles() error {
 		if err != nil {
 			return err
 		}
-		_, err := io.Copy(out, in)
-		if err != nil {
+		if _, err := io.Copy(out, in); err != nil {
 			return err
 		}
 		out.Close()
@@ -90,8 +89,7 @@ func createActions() error {
 	if err != nil {
 		return err
 	}
-	_, err := io.Copy(out, bytes.NewReader(file))
-	if err != nil {
+	if _, err := io.Copy(out, bytes.NewReader(file)); err != nil {
 		return err
 	}
 	out.Close()
