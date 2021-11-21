@@ -18,7 +18,9 @@ var modCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		runGoMod(args[0])
+		if err := runGoMod(args[0]); err != nil {
+			return err
+		}
 		return nil
 	},
 }
