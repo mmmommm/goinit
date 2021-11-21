@@ -57,7 +57,7 @@ func createFiles() error {
 		if err != nil {
 			return err
 		}
-		out, err := os.Create(filepath.Join(CurrentDir(), "example", filepath.Base(fi.Name())))
+		out, err := os.Create(filepath.Join(CurrentDir(), filepath.Base(fi.Name())))
 		if err != nil {
 			return err
 		}
@@ -73,13 +73,13 @@ func createFiles() error {
 
 // create .github/workflows/ci.yaml
 func createActions() error {
-	actionsPath := filepath.Join(CurrentDir(), "example", ".github", "workflows", "ci.yaml")
+	actionsPath := filepath.Join(CurrentDir(), ".github", "workflows", "ci.yaml")
 	file, err := local.ReadFile(filepath.Join("files", "ci.yaml"))
 	if err != nil {
 		return err
 	}
 	// i don't know chmod 0777 is best for this.
-	if err := os.MkdirAll(filepath.Join(CurrentDir(), "example", ".github", "workflows"), 0777); err != nil {
+	if err := os.MkdirAll(filepath.Join(CurrentDir(), ".github", "workflows"), 0777); err != nil {
 		return err
 	}
 	out, err := os.Create(actionsPath)
