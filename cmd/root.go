@@ -52,7 +52,9 @@ func createFiles() error {
 	}
 	for _, fi := range fis {
 		if fi.Name() == "ci.yaml" {
-			createActions()
+			if err := createActions() {
+				return err
+			}
 			return nil
 		}
 		in, err := local.Open(filepath.Join("files", fi.Name()))
@@ -63,7 +65,10 @@ func createFiles() error {
 		if err != nil {
 			return err
 		}
-		io.Copy(out, in)
+		_, err := io.Copy(out, in)
+		if err != nil {
+			return err
+		}
 		out.Close()
 		in.Close()
 		log.Println("exported", filepath.Base(fi.Name()))
@@ -85,7 +90,10 @@ func createActions() error {
 	if err != nil {
 		return err
 	}
-	io.Copy(out, bytes.NewReader(file))
+	_, err := io.Copy(out, bytes.NewReader(file))
+	if err != nil {
+		return err
+	}
 	out.Close()
 	log.Println("exported .github/workflows/ci.yaml")
 	return nil
