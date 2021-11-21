@@ -1,15 +1,22 @@
 package cmd
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
+
+func CurrentDir () string {
+	c, _ := os.Getwd()
+	return c
+}
 
 var rootCmd = &cobra.Command{
 	Use: "goinit",
@@ -23,45 +30,38 @@ func exitError(msg interface{}) {
 func Execute() {
 	rootCmd.Run = func(cmd *cobra.Command, args []string) {
 		if err := createFiles(); err != nil {
-			return
+			exitError(err)
 		}
-		if err := createDotPrefixFiles(); err != nil {
-			return
+		if err := runGoMod(); err != nil {
+			exitError(err)
 		}
-		// if err := runGoMod(); err != nil {
-		// 	exitError(err)
-		// }
 	}
-
 	if err := rootCmd.Execute(); err != nil {
 		exitError(err)
 	}
 }
 
-//go:embed files
+//go:embed files/*
 var local embed.FS
 
+// create .gitignore, LICENSE, README.md, main.go
 func createFiles() error {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	if err != nil {
-		return err
-	}
 	fis, err := local.ReadDir("files")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	for _, fi := range fis {
+		if fi.Name() == "ci.yaml" {
+			createActions()
+			return nil
+		}
 		in, err := local.Open(filepath.Join("files", fi.Name()))
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
-		out, err := os.Create(filepath.Join(currentDir, "example", filepath.Base(fi.Name())))
+		out, err := os.Create(filepath.Join(CurrentDir(), "example", filepath.Base(fi.Name())))
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		io.Copy(out, in)
 		out.Close()
@@ -71,42 +71,27 @@ func createFiles() error {
 	return nil
 }
 
-func createDotPrefixFiles() error {
-	currentDir, err := os.Getwd()
+// create .github/workflows/ci.yaml
+func createActions() error {
+	actionsPath := filepath.Join(CurrentDir(), "example", ".github", "workflows", "ci.yaml")
+	file, err := local.ReadFile(filepath.Join("files", "ci.yaml"))
 	if err != nil {
 		return err
 	}
-	actionsPath := filepath.Join(currentDir, "example", ".github", "workflows", "ci.yaml")
-	gitignorePath := filepath.Join(currentDir, "example", ".gitignore")
-
-	actionIn, err := os.Open(filepath.Join(currentDir, "files", ".github", "workflows", "ci.yaml"))
+	if err := os.MkdirAll(filepath.Join(CurrentDir(), "example", ".github", "workflows"), 0777); err != nil {
+		return err
+	}
+	out, err := os.Create(actionsPath)
 	if err != nil {
 		return err
 	}
-	gitignoreIn, err := os.Open(filepath.Join(currentDir, ".gitignore"))
-	if err != nil {
-		return err
-	}
-	if err := os.MkdirAll(actionsPath, os.ModePerm); err != nil {
-		return err
-	}
-	actionOut, err := os.Create(actionsPath)
-	if err != nil {
-		return err
-	}
-	gitignoreOut, err := os.Create(gitignorePath)
-	if err != nil {
-		return err
-	}
-	io.Copy(actionOut, actionIn)
-	io.Copy(gitignoreOut, gitignoreIn)
+	io.Copy(out, bytes.NewReader(file))
+	out.Close()
+	log.Println("exported .github/workflows/ci.yaml")
 	return nil
 }
 
-// func runGoMod() error {
-// 	pkgName := os.Args[0]
-// 	if err := exec.Command("go", "mod", "init", pkgName).Start(); err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
+func runGoMod() error {
+	exec.Command("go", "mod", "init", os.Args[0])
+	return nil
+}
