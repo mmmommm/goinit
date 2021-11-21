@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -30,9 +29,6 @@ func exitError(msg interface{}) {
 func Execute() {
 	rootCmd.Run = func(cmd *cobra.Command, args []string) {
 		if err := createFiles(); err != nil {
-			exitError(err)
-		}
-		if err := runGoMod(); err != nil {
 			exitError(err)
 		}
 	}
@@ -82,6 +78,7 @@ func createActions() error {
 	if err != nil {
 		return err
 	}
+	// i don't know chmod 0777 is best for this.
 	if err := os.MkdirAll(filepath.Join(CurrentDir(), "example", ".github", "workflows"), 0777); err != nil {
 		return err
 	}
@@ -94,10 +91,5 @@ func createActions() error {
 	}
 	out.Close()
 	log.Println("exported .github/workflows/ci.yaml")
-	return nil
-}
-
-func runGoMod() error {
-	exec.Command("go", "mod", "init", os.Args[0])
 	return nil
 }
