@@ -1,3 +1,7 @@
+![GitHub](https://img.shields.io/github/license/mmmommm/goinit)
+![GitHub CI Status](https://img.shields.io/github/workflow/status/mmmommm/goinit/ci?label=CI)
+![GitHub Release Status](https://img.shields.io/github/workflow/status/mmmommm/goinit/Release?label=release)
+
 # goinit
 Generate the initial configuration file for Go.
 
