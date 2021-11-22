@@ -39,26 +39,14 @@ func Execute() {
 //go:embed files/*
 var local embed.FS
 
-// create .gitignore, LICENSE, README.md, main.go
+// create .gitignore, .golangci.yml, LICENSE, README.md, main.go, test.yml, lint.yml
 func createFiles() error {
 	fis, err := local.ReadDir("files")
 	if err != nil {
 		return err
 	}
+	fmt.Println(len(fis))
 	for _, fi := range fis {
-		fmt.Println(fi.Name())
-		if fi.Name() == "lint.yml" {
-			if err := createActions(fi.Name()); err != nil {
-				return err
-			}
-			return nil
-		}
-		if fi.Name() == "test.yml" {
-			if err := createActions(fi.Name()); err != nil {
-				return err
-			}
-			return nil
-		}
 		in, err := local.Open(filepath.Join("files", fi.Name()))
 		if err != nil {
 			return err
@@ -74,31 +62,17 @@ func createFiles() error {
 		in.Close()
 		log.Println("exported", filepath.Base(fi.Name()))
 	}
-	return nil
-}
-
-// create .github/workflows/test.yaml, lint.yml
-func createActions(name string) error {
+	//move test.yml and lint.yml
 	actionsPath := filepath.Join(CurrentDir(), ".github", "workflows")
-	// i don't know chmod 0777 is best for this.
+	// i don't know chmod 0777 is best for this usage.
 	if err := os.MkdirAll(filepath.Join(actionsPath), 0777); err != nil {
 		return err
 	}
-	in, err := local.Open(filepath.Join("files", name))
-	if err != nil {
+	if err := os.Rename(filepath.Join(CurrentDir(), "test.yml"), filepath.Join(actionsPath, "test.yml")); err != nil {
 		return err
 	}
-	out, err := os.Create(filepath.Join(actionsPath, filepath.Base(name)))
-	if err != nil {
+	if err := os.Rename(filepath.Join(CurrentDir(), "lint.yml"), filepath.Join(actionsPath, "lint.yml")); err != nil {
 		return err
 	}
-	if _, err := io.Copy(out, in); err != nil {
-		return err
-	}
-	out.Close()
-	in.Close()
-	output := filepath.Join(".github", "workflows", filepath.Base(name))
-	log.Println("exported", output)
-
 	return nil
 }
