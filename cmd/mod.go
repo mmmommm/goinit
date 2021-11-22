@@ -35,7 +35,7 @@ func runGoMod(arg string) error {
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + string(output))
 	}
-	log.Println(output)
+	log.Println(string(output))
 	return nil
 }
 
