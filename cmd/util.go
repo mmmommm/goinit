@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func CurrentDir () string {
+func CurrentDir() string {
 	c, _ := os.Getwd()
 	return c
 }
