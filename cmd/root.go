@@ -45,9 +45,15 @@ func createFiles() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(fis)
 	for _, fi := range fis {
-		if fi.Name() == "lint.yml" || fi.Name() == "test.yml" {
+		fmt.Println(fi.Name())
+		if fi.Name() == "lint.yml" {
+			if err := createActions(fi.Name()); err != nil {
+				return err
+			}
+			return nil
+		}
+		if fi.Name() == "test.yml" {
 			if err := createActions(fi.Name()); err != nil {
 				return err
 			}
@@ -73,8 +79,8 @@ func createFiles() error {
 
 // create .github/workflows/test.yaml, lint.yml
 func createActions(name string) error {
-	fmt.Println(name)
 	actionsPath := filepath.Join(CurrentDir(), ".github", "workflows")
+	// i don't know chmod 0777 is best for this.
 	if err := os.MkdirAll(filepath.Join(actionsPath), 0777); err != nil {
 		return err
 	}
@@ -91,30 +97,7 @@ func createActions(name string) error {
 	}
 	out.Close()
 	in.Close()
-	log.Println("exported", actionsPath, filepath.Base(name))
+	log.Println("exported", ".github", "workflows", filepath.Base(name))
 
-	// testPath := filepath.Join(CurrentDir(), ".github", "workflows", "test.yml")
-	// lintPath := filepath.Join(CurrentDir(), ".github", "workflows", "lint.yml")
-	// files, err := local.ReadDir(filepath.Join("files", "test.yml"))
-	// if err != nil {
-	// 	return err
-	// }
-	// lintfile, err := local.ReadFile(filepath.Join("files", "lint.yml"))
-	// if err != nil {
-	// 	return err
-	// }
-	// // i don't know chmod 0777 is best for this.
-	// if err := os.MkdirAll(filepath.Join(CurrentDir(), ".github", "workflows"), 0777); err != nil {
-	// 	return err
-	// }
-	// out, err := os.Create(actionsPath)
-	// if err != nil {
-	// 	return err
-	// }
-	// if _, err := io.Copy(out, bytes.NewReader(file)); err != nil {
-	// 	return err
-	// }
-	// out.Close()
-	// log.Println("exported .github/workflows/ci.yaml")
 	return nil
 }
