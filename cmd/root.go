@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bytes"
 	"embed"
 	"fmt"
 	"io"
@@ -46,9 +45,10 @@ func createFiles() error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(fis)
 	for _, fi := range fis {
-		if fi.Name() == "ci.yaml" {
-			if err := createActions(); err != nil {
+		if fi.Name() == "lint.yml" || fi.Name() == "test.yml" {
+			if err := createActions(fi.Name()); err != nil {
 				return err
 			}
 			return nil
@@ -71,25 +71,50 @@ func createFiles() error {
 	return nil
 }
 
-// create .github/workflows/ci.yaml
-func createActions() error {
-	actionsPath := filepath.Join(CurrentDir(), ".github", "workflows", "ci.yaml")
-	file, err := local.ReadFile(filepath.Join("files", "ci.yaml"))
+// create .github/workflows/test.yaml, lint.yml
+func createActions(name string) error {
+	fmt.Println(name)
+	actionsPath := filepath.Join(CurrentDir(), ".github", "workflows")
+	if err := os.MkdirAll(filepath.Join(actionsPath), 0777); err != nil {
+		return err
+	}
+	in, err := local.Open(filepath.Join("files", name))
 	if err != nil {
 		return err
 	}
-	// i don't know chmod 0777 is best for this.
-	if err := os.MkdirAll(filepath.Join(CurrentDir(), ".github", "workflows"), 0777); err != nil {
-		return err
-	}
-	out, err := os.Create(actionsPath)
+	out, err := os.Create(filepath.Join(actionsPath, filepath.Base(name)))
 	if err != nil {
 		return err
 	}
-	if _, err := io.Copy(out, bytes.NewReader(file)); err != nil {
+	if _, err := io.Copy(out, in); err != nil {
 		return err
 	}
 	out.Close()
-	log.Println("exported .github/workflows/ci.yaml")
+	in.Close()
+	log.Println("exported", actionsPath, filepath.Base(name))
+
+	// testPath := filepath.Join(CurrentDir(), ".github", "workflows", "test.yml")
+	// lintPath := filepath.Join(CurrentDir(), ".github", "workflows", "lint.yml")
+	// files, err := local.ReadDir(filepath.Join("files", "test.yml"))
+	// if err != nil {
+	// 	return err
+	// }
+	// lintfile, err := local.ReadFile(filepath.Join("files", "lint.yml"))
+	// if err != nil {
+	// 	return err
+	// }
+	// // i don't know chmod 0777 is best for this.
+	// if err := os.MkdirAll(filepath.Join(CurrentDir(), ".github", "workflows"), 0777); err != nil {
+	// 	return err
+	// }
+	// out, err := os.Create(actionsPath)
+	// if err != nil {
+	// 	return err
+	// }
+	// if _, err := io.Copy(out, bytes.NewReader(file)); err != nil {
+	// 	return err
+	// }
+	// out.Close()
+	// log.Println("exported .github/workflows/ci.yaml")
 	return nil
 }

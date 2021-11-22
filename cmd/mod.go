@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"os/exec"
 
 	"github.com/spf13/cobra"
 )
 
-// worldCmd represents the world command
 var modCmd = &cobra.Command{
 	Use:   "p",
 	Short: "initialize package name",
@@ -26,6 +26,7 @@ var modCmd = &cobra.Command{
 }
 
 func runGoMod(arg string) error {
+	fmt.Println(arg)
 	exec.Command("go", "mod", "init", arg)
 	return nil
 }
