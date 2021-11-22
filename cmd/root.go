@@ -45,7 +45,6 @@ func createFiles() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(len(fis))
 	for _, fi := range fis {
 		in, err := local.Open(filepath.Join("files", fi.Name()))
 		if err != nil {
