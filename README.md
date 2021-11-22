@@ -44,17 +44,11 @@ $ goinit
 ## Option
 ```sh
 $ goinit p ${package_name}
+
+$ goinit p github.com/mmmommm/goinit
 ```
 
-Run `go mod init ${package_name}`
-
-
-#### Here is not implemented now.
-```sh
-$ goinit d
-```
-
-Create dockerfile for Go.
+This option run `go mod init ${package_name}`
 
 ## After run goinit
 
