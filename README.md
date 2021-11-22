@@ -26,7 +26,7 @@ $ go install github.com/mmmommm/goinit@latest
 ### MacOS
 If you want to install on MacOS, you can use Homebrew.
 ```
-brew install budougumi0617/tap/goinit
+brew install mmmommm/tap/goinit
 ```
 
 ## Usage
@@ -49,7 +49,7 @@ $ goinit d
 
 Create dockerfile for Go.
 
-### After run goinit
+## After run goinit
 
 ```
 go run main.go
@@ -61,4 +61,6 @@ And then response this sentence.
 
 open LICENSE file and rewrite ${your_account_name}
 
-`Copyright (c) 2021 ${your_account_name}`
+```
+Copyright (c) 2021 ${your_account_name}`
+```
