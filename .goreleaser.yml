@@ -1,30 +1,27 @@
-project_name: goinit
-env:
-  - GO111MODULE=on
 before:
   hooks:
+    # you may remove this if you don't use vgo
     - go mod tidy
+    # you may remove this if you don't need go generate
+    #- go generate ./...
+builds:
+  -
+    main: .
+    ldflags:
+      - -s -w -X main.Version={{.Version}} -X main.Revision={{.ShortCommit}}
+    env:
+      - CGO_ENABLED=0
 archives:
-  - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    replacements:
+  - replacements:
       darwin: Darwin
       linux: Linux
       windows: Windows
       386: i386
       amd64: x86_64
-    format_overrides:
-      - goos: windows
-        format: zip
-builds:
-  - main: .
-    ldflags:
-      - -s -w
-      - -X github.com/mmmommm/goinit/cmd.Version={{.Version}}
-      - -X github.com/mmmommm/goinit/cmd.Revision={{.ShortCommit}}
-    goos:
-      - linux
-      - windows
-      - darwin
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
   filters:
@@ -33,17 +30,39 @@ changelog:
       - '^test:'
 brews:
   -
+    # Name template of the recipe
+    # Default to project name
     name: goinit
-    github:
+
+    # Github repository to push the tap to.
+    tap:
       owner: mmmommm
       name: homebrew-tap
+
+    # Template for the url which is determined by the given Token (github or gitlab)
+    # Default for github is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    # Default for gitlab is "https://gitlab.com/<repo_owner>/<repo_name>/uploads/{{ .ArtifactUploadHash }}/{{ .ArtifactName }}"
     url_template: "https://github.com/mmmommm/goinit/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+
+    # Git author used to commit to the repository.
+    # Defaults are shown.
     commit_author:
-      name: goreleaserbot
-      email: goreleaser@carlosbecker.com
-    homepage: "https://mmmommm.github.io/"
-    description: "Initialization for Go."
+      name: mmmommm
+      email: ryota1839@gmail.com
+
+    # Your app's homepage.
+    # Default is empty.
+    homepage: "https://mmmommm.github.io"
+
+    # Your app's description.
+    # Default is empty.
+    description: "Initialization setting for Go."
+
+    # So you can `brew test` your formula.
+    # Default is empty.
     test: |
       system "#{bin}/goinit -h"
+    # Custom install script for brew.
+    # Default is 'bin.install "program"'.
     install: |
       bin.install "goinit"
