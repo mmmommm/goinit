@@ -97,7 +97,8 @@ func createActions(name string) error {
 	}
 	out.Close()
 	in.Close()
-	log.Println("exported", ".github", "workflows", filepath.Base(name))
+	output := filepath.Join(".github", "workflows", filepath.Base(name))
+	log.Println("exported", output)
 
 	return nil
 }
