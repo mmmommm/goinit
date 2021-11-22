@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os/exec"
 
 	"github.com/spf13/cobra"
@@ -19,22 +20,24 @@ var modCmd = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := runGoMod(args[0]); err != nil {
-			return err
+			ExitError(err)
+		}
+		if err := CreateFiles(); err != nil {
+			ExitError(err)
 		}
 		return nil
 	},
 }
 
 func runGoMod(arg string) error {
-	//p := filepath.Join(os.Getenv("GOPATH"), "pkg", "mod", arg)
 	cmd := exec.Command("go", "mod", "init", arg)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + string(output))
 	}
+	log.Println(output)
 	return nil
 }
-
 
 func init() {
 	rootCmd.AddCommand(modCmd)

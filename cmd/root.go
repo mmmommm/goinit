@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"embed"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -11,28 +10,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CurrentDir () string {
-	c, _ := os.Getwd()
-	return c
-}
-
 var rootCmd = &cobra.Command{
 	Use: "goinit",
 }
 
-func exitError(msg interface{}) {
-	fmt.Fprintln(os.Stderr, msg)
-	os.Exit(1)
-}
-
 func Execute() {
 	rootCmd.Run = func(cmd *cobra.Command, args []string) {
-		if err := createFiles(); err != nil {
-			exitError(err)
+		if err := CreateFiles(); err != nil {
+			ExitError(err)
 		}
 	}
 	if err := rootCmd.Execute(); err != nil {
-		exitError(err)
+		ExitError(err)
 	}
 }
 
@@ -40,7 +29,7 @@ func Execute() {
 var local embed.FS
 
 // create .gitignore, .golangci.yml, LICENSE, README.md, main.go, test.yml, lint.yml
-func createFiles() error {
+func CreateFiles() error {
 	fis, err := local.ReadDir("files")
 	if err != nil {
 		return err
