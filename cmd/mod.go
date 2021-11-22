@@ -3,9 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -28,11 +26,11 @@ var modCmd = &cobra.Command{
 }
 
 func runGoMod(arg string) error {
-	p := filepath.Join(os.Getenv("GOPATH"), "pkg", "mod", arg)
-	cmd := exec.Command("go", "mod", "init", p)
-	_, err := cmd.Output()
+	//p := filepath.Join(os.Getenv("GOPATH"), "pkg", "mod", arg)
+	cmd := exec.Command("go", "mod", "init", arg)
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(fmt.Sprint(err) + ": " + string(output))
 	}
 	return nil
 }
