@@ -17,8 +17,8 @@ import (
 
 var (
 	// Used for flags.
-	cfgFile     string
-	v           = "0.1.0"
+	module string
+	v      = "0.1.0"
 
 	rootCmd = &cobra.Command{
 		Use:   "goinit",
@@ -39,6 +39,8 @@ func Execute() {
 			err := run(cmd, args)
 			return err
 		},
+		Version:          v,
+		TraverseChildren: true,
 	}
 	if err := rootCmd.Execute(); err != nil {
 		util.ExitError(err)
@@ -47,23 +49,21 @@ func Execute() {
 
 func run(cmd *cobra.Command, args []string) error {
 	// get flag value
-	mFlag, _ := cmd.Flags().GetString("module")
-	vFlag, _ := cmd.Flags().GetBool("version")
-
-	// if version is true return version and return
-	if !vFlag {
-		path := filepath.Join(util.CurrentDir(), args[0])
-		if err := MakeDirectory(path); err != nil {
-			util.ExitError(err)
-		}
-		if err := CreateFiles(path); err != nil {
-			util.ExitError(err)
-		}
-		if mFlag != "" {
-			RunGoMod(mFlag)
-		}
-	} else {
-		fmt.Println("goinit version:", v)
+	initDefaultModuleFlag()
+	m, err := cmd.Flags().GetString("module")
+	if err != nil {
+		cmd.Println("\"module\" flag declared as non-string. Please correct your code")
+		return err
+	}
+	path := filepath.Join(util.CurrentDir(), args[0])
+	if err := MakeDirectory(path); err != nil {
+		util.ExitError(err)
+	}
+	if err := CreateFiles(path); err != nil {
+		util.ExitError(err)
+	}
+	if m != "" {
+		RunGoMod(m)
 	}
 	cmd.Println()
 	return nil
@@ -129,29 +129,25 @@ func RunGoMod(arg string) error {
 	return nil
 }
 
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".goinit")
-	}
-
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+// initialize module flag
+// FYI https://github.com/spf13/cobra/blob/9e1d6f1c2aa8df64b6a6ba39e92517f68580d653/command.go?_pjax=%23js-repo-pjax-container%2C%20div%5Bitemtype%3D%22http%3A%2F%2Fschema.org%2FSoftwareSourceCode%22%5D%20main%2C%20%5Bdata-pjax-container%5D#L1048
+func initDefaultModuleFlag() {
+	if rootCmd.Flags().Lookup("module") == nil {
+		usage := "module name for"
+		if rootCmd.Name() == "" {
+			usage += "this command"
+		} else {
+			usage += rootCmd.Name()
+		}
+		if rootCmd.Flags().ShorthandLookup("m") == nil {
+			rootCmd.Flags().StringVarP(&module, "module", "m", "", usage)
+		} else {
+			rootCmd.Flags().StringVar(&module, "module", "", usage)
+		}
 	}
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
 	rootCmd.Flags().StringP("module", "m", "", "-m option run `go mod init ${argument}`")
-	rootCmd.Flags().BoolP("version", "v", false, "-v option show version")
+	cobra.CheckErr(viper.BindPFlag("module", rootCmd.PersistentFlags().Lookup("module")))
 }
