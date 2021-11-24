@@ -68,7 +68,7 @@ func run(cmd *cobra.Command, args []string) error {
 		util.ExitError(err)
 	}
 	if m != "" {
-		RunGoMod(m)
+		RunGoMod(m, path)
 	}
 	return nil
 }
@@ -120,7 +120,10 @@ func CreateFiles(path string) error {
 	return nil
 }
 
-func RunGoMod(arg string) error {
+func RunGoMod(arg, path string) error {
+	if err := os.Chdir(path); err != nil {
+		return err
+	}
 	cmd := exec.Command("go", "mod", "init", arg)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -129,4 +132,3 @@ func RunGoMod(arg string) error {
 	log.Println(string(output))
 	return nil
 }
-

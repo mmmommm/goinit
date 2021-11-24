@@ -38,17 +38,17 @@ brew upgrade mmmommm/tap/goinit
 ```
 ## Usage
 ```sh
-$ goinit
+$ goinit ${directory_name}
 ```
 
 ## Option
 ```sh
-$ goinit p ${package_name}
+$ goinit ${directory_name} -m ${package_name}
 
-$ goinit p github.com/mmmommm/goinit
+$ goinit example -m github.com/mmmommm/example
 ```
 
-This option run `go mod init ${package_name}`
+
 
 ## After run goinit
 
