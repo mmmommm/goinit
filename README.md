@@ -4,7 +4,7 @@
 # goinit
 Generate initial configuration files for Go.
 
-<img width="524" alt="スクリーンショット 2021-11-24 9 59 41" src="https://user-images.githubusercontent.com/51479834/143152499-3e4dbd69-ded8-4121-8d58-a57f623bb4e0.png">
+<img width="524" alt="example usage goinit command" src="https://user-images.githubusercontent.com/51479834/143152499-3e4dbd69-ded8-4121-8d58-a57f623bb4e0.png">
 
 
 
@@ -40,6 +40,8 @@ brew upgrade mmmommm/tap/goinit
 ## Usage
 ```sh
 $ goinit ${directory_name}
+
+$ goinit example
 ```
 
 ## Option
