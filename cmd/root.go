@@ -12,10 +12,12 @@ import (
 
 	"github.com/mmmommm/goinit/util"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
+	//go:embed files/*
+	local embed.FS
+
 	// Used for flags.
 	module string
 	v      = "0.1.0"
@@ -36,20 +38,23 @@ func Execute() {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if args[0] == "goinit" {
+				return errors.New("don't use \"goinit\" for directory name, please use another one")
+			}
+
 			err := run(cmd, args)
 			return err
 		},
 		Version:          v,
 		TraverseChildren: true,
 	}
+	rootCmd.PersistentFlags().StringVarP(&module, "module", "m", "", "-m")
 	if err := rootCmd.Execute(); err != nil {
 		util.ExitError(err)
 	}
 }
 
 func run(cmd *cobra.Command, args []string) error {
-	// get flag value
-	initDefaultModuleFlag()
 	m, err := cmd.Flags().GetString("module")
 	if err != nil {
 		cmd.Println("\"module\" flag declared as non-string. Please correct your code")
@@ -65,7 +70,6 @@ func run(cmd *cobra.Command, args []string) error {
 	if m != "" {
 		RunGoMod(m)
 	}
-	cmd.Println()
 	return nil
 }
 
@@ -78,9 +82,6 @@ func MakeDirectory(path string) error {
 	}
 	return nil
 }
-
-//go:embed files/*
-var local embed.FS
 
 // create .gitignore, .golangci.yml, LICENSE, README.md, main.go, test.yml, lint.yml
 func CreateFiles(path string) error {
@@ -129,25 +130,3 @@ func RunGoMod(arg string) error {
 	return nil
 }
 
-// initialize module flag
-// FYI https://github.com/spf13/cobra/blob/9e1d6f1c2aa8df64b6a6ba39e92517f68580d653/command.go?_pjax=%23js-repo-pjax-container%2C%20div%5Bitemtype%3D%22http%3A%2F%2Fschema.org%2FSoftwareSourceCode%22%5D%20main%2C%20%5Bdata-pjax-container%5D#L1048
-func initDefaultModuleFlag() {
-	if rootCmd.Flags().Lookup("module") == nil {
-		usage := "module name for"
-		if rootCmd.Name() == "" {
-			usage += "this command"
-		} else {
-			usage += rootCmd.Name()
-		}
-		if rootCmd.Flags().ShorthandLookup("m") == nil {
-			rootCmd.Flags().StringVarP(&module, "module", "m", "", usage)
-		} else {
-			rootCmd.Flags().StringVar(&module, "module", "", usage)
-		}
-	}
-}
-
-func init() {
-	rootCmd.Flags().StringP("module", "m", "", "-m option run `go mod init ${argument}`")
-	cobra.CheckErr(viper.BindPFlag("module", rootCmd.PersistentFlags().Lookup("module")))
-}
