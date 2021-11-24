@@ -57,8 +57,7 @@ func Execute() {
 func run(cmd *cobra.Command, args []string) error {
 	m, err := cmd.Flags().GetString("module")
 	if err != nil {
-		cmd.Println("\"module\" flag declared as non-string. Please correct your code")
-		return err
+		return errors.New("\"module\" flag declared as non-string. Please correct your code")
 	}
 	path := filepath.Join(util.CurrentDir(), args[0])
 	if err := MakeDirectory(path); err != nil {
@@ -75,7 +74,6 @@ func run(cmd *cobra.Command, args []string) error {
 
 // create directory that user pass name
 func MakeDirectory(path string) error {
-	// MkDirAll func is better?
 	err := os.Mkdir(path, 0777)
 	if err != nil {
 		return err
@@ -105,12 +103,13 @@ func CreateFiles(path string) error {
 		in.Close()
 		log.Println("exported", filepath.Base(fi.Name()))
 	}
-	//move test.yml and lint.yml
 	actionsPath := filepath.Join(path, ".github", "workflows")
 	// i don't know chmod 0777 is best for this usage.
 	if err := os.MkdirAll(filepath.Join(actionsPath), 0777); err != nil {
 		return err
 	}
+
+	//move test.yml and lint.yml
 	if err := os.Rename(filepath.Join(path, "test.yml"), filepath.Join(actionsPath, "test.yml")); err != nil {
 		return err
 	}
