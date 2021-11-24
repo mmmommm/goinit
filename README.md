@@ -30,6 +30,9 @@ If you want to install on MacOS, you can use Homebrew.
 brew install mmmommm/tap/goinit
 ```
 
+### Windows, Linux etc...
+Download the binary from [here](https://github.com/mmmommm/goinit/releases/tag/v0.1.4).
+
 #### upgrade
 ```
 brew upgrade mmmommm/tap/goinit
