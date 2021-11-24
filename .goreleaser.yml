@@ -7,6 +7,14 @@ before:
 builds:
   -
     main: .
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+      - 386
     ldflags:
       - -s -w -X main.Version={{.Version}} -X main.Revision={{.ShortCommit}}
     env:
