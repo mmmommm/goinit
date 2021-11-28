@@ -7,7 +7,7 @@ curl localhost:8080/Go
 ```
 
 And then response this sentence.
->Hi there, I love Go`
+>Hi there, I love Go!`
 
 open LICENSE file and rewrite ${your_account_name}
 
