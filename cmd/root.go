@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	//go:embed files/*
+	//go:embed example/*
 	local embed.FS
 
 	// Used for flags.
