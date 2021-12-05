@@ -20,7 +20,7 @@ var (
 
 	// Used for flags.
 	module string
-	v      = "0.1.4"
+	v      = "0.1.5"
 
 	rootCmd = &cobra.Command{
 		Use:   "goinit",
