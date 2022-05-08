@@ -4,14 +4,13 @@ on: [pull_request]
 
 jobs:
   golangci-lint:
-    name: runner / golangci-lint
-    strategy:
-      matrix:
-        go-version: [1.17.x]
-    runs-on: ubuntu-20.04
+    name: golangci-lint
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
       - name: reviewdog / added
         uses: reviewdog/action-golangci-lint@v2
         with:
